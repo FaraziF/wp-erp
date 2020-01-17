@@ -1690,18 +1690,20 @@ if (false) {(function () {
     };
   },
   created: function created() {
+    var _this = this;
+
     this.url = this.generateUrl();
-    this.selectedCountry();
-    this.setInputField();
     this.getCustomers();
-    this.getCountries();
+    this.getCountries(function () {
+      return _this.setInputField();
+    });
   },
   mounted: function mounted() {
     window.acct.hooks.doAction('acctPeopleID', this.peopleFields.id);
   },
   methods: {
     saveCustomer: function saveCustomer() {
-      var _this = this;
+      var _this2 = this;
 
       var peopleFields = window.acct.hooks.applyFilters('acctPeopleFieldsData', this.peopleFields);
 
@@ -1723,13 +1725,13 @@ if (false) {(function () {
 
       var message = type === 'post' ? 'Created' : 'Updated';
       __WEBPACK_IMPORTED_MODULE_0_admin_http__["a" /* default */][type](url, peopleFields).then(function (response) {
-        _this.$root.$emit('peopleUpdate');
+        _this2.$root.$emit('peopleUpdate');
 
-        _this.resetForm();
+        _this2.resetForm();
 
-        _this.$store.dispatch('spinner/setSpinner', false);
+        _this2.$store.dispatch('spinner/setSpinner', false);
 
-        _this.showAlert('success', message);
+        _this2.showAlert('success', message);
       });
     },
     checkForm: function checkForm() {
@@ -1766,8 +1768,8 @@ if (false) {(function () {
     showDetails: function showDetails() {
       this.showMore = !this.showMore;
     },
-    getCountries: function getCountries() {
-      var _this2 = this;
+    getCountries: function getCountries(callBack) {
+      var _this3 = this;
 
       __WEBPACK_IMPORTED_MODULE_0_admin_http__["a" /* default */].get('customers/country').then(function (response) {
         var country = response.data.country;
@@ -1778,20 +1780,24 @@ if (false) {(function () {
             states[x] = [];
           }
 
-          _this2.countries.push({
+          _this3.countries.push({
             id: x,
-            name: _this2.decodeHtml(country[x]),
+            name: _this3.decodeHtml(country[x]),
             state: states[x]
           });
         }
 
         for (var state in states) {
           for (var _x in states[state]) {
-            _this2.get_states.push({
+            _this3.get_states.push({
               id: _x,
               name: states[state][_x]
             });
           }
+        }
+
+        if (typeof callBack !== 'undefined') {
+          callBack();
         }
       });
     },
@@ -1810,7 +1816,7 @@ if (false) {(function () {
       }
     },
     checkEmailExistence: function checkEmailExistence() {
-      var _this3 = this;
+      var _this4 = this;
 
       if (this.peopleFields.email) {
         if (!this.people) {
@@ -1819,16 +1825,16 @@ if (false) {(function () {
               email: this.peopleFields.email
             }
           }).then(function (res) {
-            _this3.emailExists = res.data;
+            _this4.emailExists = res.data;
           });
         }
       }
     },
     getCustomers: function getCustomers() {
-      var _this4 = this;
+      var _this5 = this;
 
       __WEBPACK_IMPORTED_MODULE_0_admin_http__["a" /* default */].get('/customers').then(function (response) {
-        _this4.customers = response.data;
+        _this5.customers = response.data;
       });
     },
     setInputField: function setInputField() {
@@ -1848,17 +1854,22 @@ if (false) {(function () {
         this.peopleFields.street_2 = people.billing.street_2;
         this.peopleFields.city = people.billing.city;
         this.peopleFields.country = this.selectedCountry(people.billing.country);
-        this.peopleFields.state = this.selectedState(people.billing.state);
         this.peopleFields.postal_code = people.billing.postal_code;
 
         if (people.photo) {
+          this.peopleFields.photo_id = people.photo_id;
           this.peopleFields.photo = people.photo;
+        }
+
+        if (Object.prototype.hasOwnProperty.call(this.peopleFields.country, 'id')) {
+          this.getState(this.peopleFields.country);
+          this.peopleFields.state = this.selectedState(people.billing.state);
         }
       }
     },
     selectedCountry: function selectedCountry(id) {
       return this.countries.find(function (country) {
-        return id === country.id;
+        return country.id === id;
       });
     },
     selectedState: function selectedState(id) {
@@ -13071,7 +13082,7 @@ var render = function() {
                                       ],
                                       staticClass: "wperp-form-field",
                                       attrs: {
-                                        type: "number",
+                                        type: "text",
                                         id: "post_code",
                                         placeholder: _vm.__("Post Code", "erp")
                                       },
@@ -16987,7 +16998,8 @@ if (false) {(function () {
       opening_balance: 0,
       people_balance: 0,
       outstanding: 0,
-      temp: null
+      temp: null,
+      req_url: ''
     };
   },
   created: function created() {
@@ -17016,9 +17028,16 @@ if (false) {(function () {
     fetchItem: function fetchItem(id) {
       var _this2 = this;
 
-      __WEBPACK_IMPORTED_MODULE_1_admin_http__["a" /* default */].get(this.url + '/' + id, {
+      if (this.$route.name === 'VendorDetails') {
+        this.req_url = 'vendors';
+      } else if (this.$route.name === 'CustomerDetails') {
+        this.req_url = 'customers';
+      }
+
+      __WEBPACK_IMPORTED_MODULE_1_admin_http__["a" /* default */].get(this.req_url + '/' + id, {
         params: {}
       }).then(function (response) {
+        console.log(response.data);
         _this2.resData = response.data;
       });
     },
@@ -17026,7 +17045,7 @@ if (false) {(function () {
       var _this3 = this;
 
       this.$store.dispatch('spinner/setSpinner', true);
-      __WEBPACK_IMPORTED_MODULE_1_admin_http__["a" /* default */].get(this.url + '/' + this.userId + '/transactions').then(function (res) {
+      __WEBPACK_IMPORTED_MODULE_1_admin_http__["a" /* default */].get(this.req_url + '/' + this.userId + '/transactions').then(function (res) {
         _this3.transactions = res.data;
 
         _this3.$store.dispatch('spinner/setSpinner', false);
@@ -17707,7 +17726,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
       __WEBPACK_IMPORTED_MODULE_4_admin_http__["a" /* default */].get("/people/".concat(customer_id)).then(function (response) {
         var billing = response.data;
-        var address = "Street: ".concat(billing.street_1, " ").concat(billing.street_2, " \nCity: ").concat(billing.city, " \nState: ").concat(billing.state, " \nCountry: ").concat(billing.country);
+        var address = "".concat(billing.street_1, ", ").concat(billing.street_2, " \n").concat(billing.city, " \n").concat(billing.state, ", ").concat(billing.postal_code, " \n").concat(billing.country);
         _this3.basic_fields.billing_address = address;
       });
     },
@@ -19593,7 +19612,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
       __WEBPACK_IMPORTED_MODULE_3_admin_http__["a" /* default */].get("/people/".concat(customer_id)).then(function (response) {
         var billing = response.data;
-        var address = "Street: ".concat(billing.street_1, " ").concat(billing.street_2, " \nCity: ").concat(billing.city, " \nState: ").concat(billing.state, " \nCountry: ").concat(billing.country);
+        var address = "".concat(billing.street_1, ", ").concat(billing.street_2, " \n").concat(billing.city, " \n").concat(billing.state, ", ").concat(billing.postal_code, " \n").concat(billing.country);
         _this3.basic_fields.billing_address = address;
       });
     },
@@ -20200,7 +20219,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
       __WEBPACK_IMPORTED_MODULE_3_admin_http__["a" /* default */].get("/people/".concat(peopleId)).then(function (response) {
         var billing = response.data;
-        var address = "Street: ".concat(billing.street_1, " ").concat(billing.street_2, " \nCity: ").concat(billing.city, " \nState: ").concat(billing.state, " \nCountry: ").concat(billing.country);
+        var address = "".concat(billing.street_1, ", ").concat(billing.street_2, " \n").concat(billing.city, " \n").concat(billing.state, ", ").concat(billing.postal_code, " \n").concat(billing.country);
         _this4.basic_fields.billing_address = address;
       });
     },
@@ -20897,7 +20916,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
       __WEBPACK_IMPORTED_MODULE_2_admin_http__["a" /* default */].get("/people/".concat(people_id)).then(function (response) {
         var billing = response.data;
-        var address = "Street: ".concat(billing.street_1, " ").concat(billing.street_2, " \nCity: ").concat(billing.city, " \nState: ").concat(billing.state, " \nCountry: ").concat(billing.country);
+        var address = "".concat(billing.street_1, " ").concat(billing.street_2, " \n").concat(billing.city, " \n").concat(billing.state, " ").concat(billing.postal_code, " \n").concat(billing.country);
         _this4.basic_fields.billing_address = address;
       });
     },
@@ -21624,10 +21643,10 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
               case 18:
                 /**
-                 * ----------------------------------------------
-                 * create a new purchase
-                 * -----------------------------------------------
-                 */
+                     * ----------------------------------------------
+                     * create a new purchase
+                     * -----------------------------------------------
+                     */
                 this.basic_fields.trn_date = erp_acct_var.current_date;
                 this.basic_fields.due_date = erp_acct_var.current_date;
                 this.transactionLines.push({}, {}, {}); // initialize combo button id with `save`
@@ -21723,7 +21742,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
       __WEBPACK_IMPORTED_MODULE_4_admin_http__["a" /* default */].get("/people/".concat(vendor_id)).then(function (response) {
         var billing = response.data;
-        var address = "Street: ".concat(billing.street_1, " ").concat(billing.street_2, " \nCity: ").concat(billing.city, " \nState: ").concat(billing.state, " \nCountry: ").concat(billing.country);
+        var address = "".concat(billing.street_1, " ").concat(billing.street_2, " \n").concat(billing.city, " \n").concat(billing.state, " ").concat(billing.postal_code, " \n").concat(billing.country);
         _this3.basic_fields.billing_address = address;
       });
       this.getProducts();
@@ -22652,7 +22671,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
       __WEBPACK_IMPORTED_MODULE_2_admin_http__["a" /* default */].get("/people/".concat(vendor_id)).then(function (response) {
         var billing = response.data;
-        var address = "Street: ".concat(billing.street_1, " ").concat(billing.street_2, " \nCity: ").concat(billing.city, " \nState: ").concat(billing.state, " \nCountry: ").concat(billing.country);
+        var address = "".concat(billing.street_1, " ").concat(billing.street_2, " \n").concat(billing.city, " \n").concat(billing.state, " ").concat(billing.postal_code, " \n").concat(billing.country);
         _this3.basic_fields.billing_address = address;
       });
     },
@@ -23068,6 +23087,8 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_admin_http__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_admin_components_list_table_ListTable_vue__ = __webpack_require__(3);
+//
+//
 //
 //
 //
@@ -24558,7 +24579,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
           return;
         }
 
-        var address = "Street: ".concat(billing.street_1, " ").concat(billing.street_2, " \nCity: ").concat(billing.city, " \nState: ").concat(billing.state, " \nCountry: ").concat(billing.country);
+        var address = "".concat(billing.street_1, ", ").concat(billing.street_2, " \n").concat(billing.city, " \n").concat(billing.state, ", ").concat(billing.postal_code, " \n").concat(billing.country);
         _this5.basic_fields.billing_address = address;
       });
     },
@@ -30506,7 +30527,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
       __WEBPACK_IMPORTED_MODULE_3_admin_http__["a" /* default */].get("/people/".concat(people_id)).then(function (response) {
         var billing = response.data;
-        var address = "Street: ".concat(billing.street_1, " ").concat(billing.street_2, " \nCity: ").concat(billing.city, " \nState: ").concat(billing.state, " \nCountry: ").concat(billing.country);
+        var address = "".concat(billing.street_1, ", ").concat(billing.street_2, " \n").concat(billing.city, " \n").concat(billing.state, ", ").concat(billing.postal_code, " \n").concat(billing.country);
         _this5.basic_fields.billing_address = address;
       });
     },
@@ -32747,7 +32768,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
           url: 'https://wperp.com/docs/accounting/sales-transactions/creating-your-first-invoice/'
         }, {
           label: window.__('How to receive payment from invoices?', 'erp'),
-          url: 'https://wperp.com/docs/accounting/sales-transactions/receive-payment-new/'
+          url: 'https://wperp.com/docs/accounting/sales-transactions/adding-invoice-payments/'
         }, {
           label: window.__('How can I delete an invoice?', 'erp'),
           url: 'https://wperp.com/docs/accounting/sales-transactions/creating-your-first-invoice/'
@@ -34285,7 +34306,7 @@ var render = function() {
       _vm._v(" "),
       _c("list-table", {
         attrs: {
-          tableClass: "wperp-table people-table table-striped table-dark",
+          tableClass: "wperp-table people-table table-striped table-dark ",
           "action-column": "actions",
           columns: _vm.columns,
           rows: _vm.row_data,
@@ -35459,7 +35480,8 @@ var render = function() {
         [
           _c("list-table", {
             attrs: {
-              tableClass: "wperp-table table-striped table-dark widefat",
+              tableClass:
+                "wperp-table people-trns-table table-striped table-dark widefat",
               "action-column": "actions",
               columns: _vm.columns,
               rows: _vm.rows,
@@ -46015,6 +46037,7 @@ var render = function() {
                               staticClass: "wperp-form-field display-flex",
                               attrs: {
                                 rows: "4",
+                                maxlength: "250",
                                 placeholder: _vm.__("Particulars", "erp")
                               },
                               domProps: { value: _vm.particulars },
@@ -47888,6 +47911,7 @@ var render = function() {
                       staticClass: "wperp-form-field display-flex",
                       attrs: {
                         rows: "4",
+                        maxlength: "250",
                         placeholder: _vm.__("Internal Information", "erp")
                       },
                       domProps: { value: _vm.particulars },
@@ -48360,6 +48384,7 @@ var render = function() {
                           staticClass: "wperp-form-field display-flex",
                           attrs: {
                             rows: "1",
+                            maxlength: "250",
                             placeholder: _vm.__("Particulars", "erp")
                           },
                           domProps: { value: line.description },
@@ -48541,6 +48566,7 @@ var render = function() {
                           staticClass: "wperp-form-field display-flex",
                           attrs: {
                             rows: "4",
+                            maxlength: "250",
                             placeholder: _vm.__("Internal Information", "erp")
                           },
                           domProps: { value: _vm.particulars },
@@ -48612,7 +48638,7 @@ var render = function() {
                             ]),
                             _vm._v(" "),
                             _c("file-upload", {
-                              attrs: { url: "/bills/attachments" },
+                              attrs: { url: "/invoices/attachments" },
                               model: {
                                 value: _vm.attachments,
                                 callback: function($$v) {
@@ -49624,6 +49650,7 @@ var render = function() {
                       staticClass: "wperp-form-field display-flex",
                       attrs: {
                         rows: "4",
+                        maxlength: "250",
                         placeholder: _vm.__("Internal Information", "erp")
                       },
                       domProps: { value: _vm.particulars },
@@ -50798,6 +50825,7 @@ var render = function() {
                           staticClass: "wperp-form-field display-flex",
                           attrs: {
                             rows: "4",
+                            maxlength: "250",
                             placeholder: _vm.__("Particulars", "erp")
                           },
                           domProps: { value: _vm.particulars },
@@ -51870,6 +51898,7 @@ var render = function() {
                       staticClass: "wperp-form-field display-flex",
                       attrs: {
                         rows: "4",
+                        maxlength: "250",
                         placeholder: _vm.__("Internal Information", "erp")
                       },
                       domProps: { value: _vm.particulars },
@@ -52469,11 +52498,17 @@ var render = function() {
             on: {
               click: function($event) {
                 $event.preventDefault()
-                return _vm.$router.push("journals/new")
+                return _vm.$router.push({ name: "JournalCreate" })
               }
             }
           },
-          [_vm._v(_vm._s(_vm.__("New Journal Entry", "erp")))]
+          [
+            _vm._v(
+              "\n            " +
+                _vm._s(_vm.__("New Journal Entry", "erp")) +
+                "\n        "
+            )
+          ]
         )
       ]),
       _vm._v(" "),
@@ -52714,6 +52749,7 @@ var render = function() {
                     staticClass: "wperp-form-field display-flex",
                     attrs: {
                       rows: "1",
+                      maxlength: "250",
                       placeholder: _vm.__("Internal Information", "erp")
                     },
                     domProps: { value: _vm.journal_parti },
@@ -52840,7 +52876,7 @@ var render = function() {
                                 }
                               ],
                               staticClass: "wperp-form-field",
-                              attrs: { type: "text" },
+                              attrs: { type: "text", maxlength: "250" },
                               domProps: { value: _vm.particulars[key] },
                               on: {
                                 input: function($event) {
@@ -53866,6 +53902,7 @@ var render = function() {
                       name: "particulars",
                       id: "particulars",
                       rows: "3",
+                      maxlength: "250",
                       placeholder: _vm.__("Type Here", "erp")
                     },
                     domProps: { value: _vm.particulars },
@@ -54616,6 +54653,7 @@ var render = function() {
                           staticClass: "wperp-form-field display-flex",
                           attrs: {
                             rows: "1",
+                            maxlength: "250",
                             placeholder: _vm.__("Particulars", "erp")
                           },
                           domProps: { value: line.particulars },
@@ -54796,6 +54834,7 @@ var render = function() {
                           staticClass: "wperp-form-field display-flex",
                           attrs: {
                             rows: "4",
+                            maxlength: "250",
                             placeholder: _vm.__("Internal Information", "erp")
                           },
                           domProps: { value: _vm.particulars },
@@ -58516,7 +58555,7 @@ var render = function() {
                         }
                       ],
                       staticClass: "wperp-form-field",
-                      attrs: { rows: "4" },
+                      attrs: { rows: "4", maxlength: "250" },
                       domProps: { value: _vm.desc },
                       on: {
                         input: function($event) {
@@ -59678,6 +59717,7 @@ var render = function() {
                   staticClass: "wperp-form-field",
                   attrs: {
                     rows: "3",
+                    maxlength: "250",
                     placeholder: _vm.__("Enter Particulars", "erp")
                   },
                   domProps: { value: _vm.particulars },
@@ -61614,6 +61654,7 @@ var render = function() {
                           staticClass: "wperp-form-field display-flex",
                           attrs: {
                             rows: "1",
+                            maxlength: "250",
                             placeholder: _vm.__("Particulars", "erp")
                           },
                           domProps: { value: line.particulars },
@@ -61796,6 +61837,7 @@ var render = function() {
                           staticClass: "wperp-form-field display-flex",
                           attrs: {
                             rows: "4",
+                            maxlength: "250",
                             placeholder: _vm.__("Internal Information", "erp")
                           },
                           domProps: { value: _vm.particulars },
