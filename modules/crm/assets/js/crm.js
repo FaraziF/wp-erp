@@ -130,7 +130,7 @@
             $( 'select.erp-crm-contact-list-dropdown' ).select2({
                 allowClear: true,
                 placeholder: $(this).attr('data-placeholder'),
-                minimumInputLength: 3,
+                minimumInputLength: 1,
                 ajax: {
                     url: wpErpCrm.ajaxurl,
                     dataType: 'json',
@@ -207,7 +207,7 @@
             var self = $(this),
                 country = self.val(),
                 parent = self.closest(self.data('parent')),
-                empty = '<option value="">- Select -</option>';
+                empty = '<option value="">- '+ __('Select', 'erp') +' -</option>';
 
             if (wpErpCrm.wpErpCountries[country]) {
                 var options = '',

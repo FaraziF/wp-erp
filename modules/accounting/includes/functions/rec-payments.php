@@ -103,7 +103,7 @@ function erp_acct_insert_payment( $data ) {
     $data['created_at'] = date( 'Y-m-d H:i:s' );
     $data['created_by'] = $created_by;
     $voucher_no         = null;
-    $currency           = erp_get_currency();
+    $currency           = erp_get_currency(true);
 
     try {
         $wpdb->query( 'START TRANSACTION' );
@@ -452,7 +452,8 @@ function erp_acct_void_payment( $id ) {
     );
 
     $wpdb->delete( $wpdb->prefix . 'erp_acct_ledger_details', array( 'trn_no' => $id ) );
-    $wpdb->delete( $wpdb->prefix . 'erp_acct_invoice_account_details', array( 'invoice_no' => $id ) );
+    $wpdb->delete( $wpdb->prefix . 'erp_acct_invoice_account_details', array( 'trn_no' => $id ) );
+
 }
 
 /**
@@ -587,3 +588,4 @@ function erp_acct_format_payment_line_items( $invoice = 'all' ) {
 
     return $wpdb->get_results( $sql, ARRAY_A );
 }
+

@@ -44,21 +44,57 @@ function erp_acct_get_currencies_for_dropdown() {
 function erp_acct_get_currency_symbol() {
     global $wpdb;
 
-    $active_currency_id = erp_get_currency();
+    $active_currency_id = erp_get_currency(true);
 
-    return $wpdb->get_var( $wpdb->prepare( "SELECT sign FROM {$wpdb->prefix}erp_acct_currency_info WHERE id = %d", absint( $active_currency_id ) ) );
+    return $wpdb->get_var(
+        $wpdb->prepare(
+            "SELECT sign FROM {$wpdb->prefix}erp_acct_currency_info WHERE id = %d",
+            absint( $active_currency_id )
+        )
+    );
 }
 
 /**
  * Get the price format depending on the currency position.
  *
+ * Use it for JavaScript
+ *
  * @return string
  */
 function erp_acct_get_price_format() {
     $currency_pos = erp_get_option( 'erp_ac_currency_position', false, 'left' );
-    $format       = '%1$s%2$s';
+    $format       = '%s%v';
 
     switch ( $currency_pos ) {
+        case 'left':
+            $format = '%s%v';
+            break;
+        case 'right':
+            $format = '%v%s';
+            break;
+        case 'left_space':
+            $format = '%s&nbsp;%v';
+            break;
+        case 'right_space':
+            $format = '%v&nbsp;%s';
+            break;
+    }
+
+    return apply_filters( 'erp_acct_price_format', $format, $currency_pos );
+}
+
+/**
+ * Get the price format depending on the currency position.
+ *
+ * Use it for PHP
+ *
+ * @return string
+ */
+function erp_acct_get_price_format_php() {
+    $currency_pos = erp_get_option( 'erp_ac_currency_position', false, 'left' );
+    $format       = '%1$s%2$s';
+
+    switch ($currency_pos) {
         case 'left':
             $format = '%1$s%2$s';
             break;
@@ -73,7 +109,7 @@ function erp_acct_get_price_format() {
             break;
     }
 
-    return apply_filters( 'erp_acct_price_format', $format, $currency_pos );
+    return apply_filters( 'erp_acct_price_format_php', $format, $currency_pos );
 }
 
 /**
@@ -96,7 +132,7 @@ function erp_acct_get_price( $main_price, $args = array() ) {
 					'decimal_separator'  => erp_get_option( 'erp_ac_de_separator', false, '.' ),
 					'thousand_separator' => erp_get_option( 'erp_ac_th_separator', false, ',' ),
 					'decimals'           => absint( erp_get_option( 'erp_ac_nm_decimal', false, 2 ) ),
-					'price_format'       => erp_acct_get_price_format(),
+					'price_format'       => erp_acct_get_price_format_php(),
 					'symbol'             => true,
 					'currency_symbol'    => erp_acct_get_currency_symbol(),
                 )

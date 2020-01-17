@@ -3,9 +3,9 @@ Contributors: tareq1988, nizamuddinbabu, wedevs, ediamin, sabbir1991, asaquzzama
 Donate Link: https://tareq.co/donate
 Tags: business manager, erp, accounting, crm, hr, project manager, small business, SME, contact, contacts, Customer Relationship Management, employee, leave management, hr, human resource management, job, jobs, job listing, lead management, opportunity, schedule, task, lead, holiday, company
 Requires at least: 4.4
-Tested up to: 5.2.4
+Tested up to: 5.3.2
 Requires PHP: 5.6
-Stable tag: 1.5.6
+Stable tag: 1.5.10
 License: GPLv2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -155,6 +155,13 @@ experience.
 = Visit our website to learn more =
 ➡️ [WPERP, Inc. HR CRM Accounting](https://wperp.com/)⬅️
 
+= Privacy Policy =
+WP ERP uses [Appsero](https://appsero.com) SDK to collect some telemetry data upon user's confirmation. This helps us to troubleshoot problems faster & make product improvements.
+
+Appsero SDK **does not gather any data by default.** The SDK only starts gathering basic telemetry data **when a user allows it via the admin notice**. We collect the data to ensure great user experience for all our users.
+
+Integrating Appsero SDK **DOES NOT IMMEDIATELY** start gathering data, **without confirmation from users in any case.**
+
 = Contribute =
 This may have bugs and lack of many features. If you want to contribute on this project, you are more than welcome. Please fork the repository from [Github](https://github.com/wp-erp/wp-erp).
 
@@ -259,6 +266,38 @@ No, WP ERP and its add-ons do not support multisite WordPress installation.
 
 
 == Changelog ==
+
+= v1.5.10 -> December 19, 2019 =
+[fix] CR: Fixed file attachment issue.
+[tweak] Add privacy policy in readme.txt
+
+= v1.5.9 -> December 11, 2019 =
+[fix] Updated: CRM js loading sequence. Which was causing CRM single page view not working properly.
+[fix] Fixed: Redirect to CRM overview page after login as CRM Agent
+
+= v1.5.8 -> December 10, 2019 =
+[fix]   HR: Fixed country, state schema type for customer & vendor.
+[fix]   CRM: Made the strings translatable that are not translatable.
+[tweak] CRM: Moved customer statistics from admin dashboard to crm dashboard.
+[fix]   AC: Fixed the Customer transactions wrong balance issue.
+[fix]   AC: Amount was not showing on PDF invoice, which has been fixed.
+[fix]   AC: Decimals valus were not appearing in the Pay Purchase. It has fixed now.
+[fix]   AC: Particulars were not showing in journal entries. Fixed now.
+[fix]   AC: Unit price was showing Zero in purchase single view. It has been fixed.
+[fix]   AC: Fixed the Void transaction related issues.
+[fix]   AC: Fixed the wrong balance issue in the People details.
+[fix]   AC: Show only the products of selected vendor in purchase.
+[tweak] AC: Disabled Product type while editing product to preserve reports.
+[tweak] AC: Updated modal style.
+
+= v1.5.7 -> November 15, 2019 =
+[fix] Fixed the SQL syntax error for DB collate which was causing installation error in some cases.
+[fix] AC: Fixed financial year creating an issue.
+[fix] AC: Changing currency position was not reflecting Accounting, this has been fixed now.
+[fix] AC: Changing currency was not working and it was always fixed for USD, this has been fixed now.
+[fix] AC: Added decimal amount support to pay the purchases.
+[fix] AC: After the Purchase edit, the trial balance mismatch issue has been fixed.
+[tweak] Added form changes saving alert in Settings.
 
 = v1.5.6 -> November 01, 2019 =
 [new] HR: Hiring date anniversary reminder and wishing email to employees.

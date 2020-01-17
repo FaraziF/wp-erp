@@ -39,7 +39,7 @@ function erp_acct_get_all_journals( $args = [] ) {
     if ( $args['count'] ) {
         $sql .= ' COUNT( DISTINCT journal.id ) as total_number';
     } else {
-        $sql .= ' *';
+        $sql .= ' journal.*';
     }
 
     $sql .= " FROM {$wpdb->prefix}erp_acct_journals AS journal LEFT JOIN {$wpdb->prefix}erp_acct_journal_details AS journal_detail";
@@ -103,7 +103,7 @@ function erp_acct_insert_journal( $data ) {
     $data['created_by'] = $created_by;
 
     $voucher_no = null;
-    $currency   = erp_get_currency();
+    $currency   = erp_get_currency(true);
 
     try {
         $wpdb->query( 'START TRANSACTION' );
