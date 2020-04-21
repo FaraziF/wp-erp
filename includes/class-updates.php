@@ -46,7 +46,8 @@ class Updates {
         '1.5.2'  => 'updates/update-1.5.2.php',
         '1.5.4'  => 'updates/update-1.5.4.php',
         '1.5.5'  => 'updates/update-1.5.5.php',
-        '1.5.6'  => 'updates/update-1.5.6.php'
+        '1.5.6'  => 'updates/update-1.5.6.php',
+        '1.5.16'  => 'updates/update-1.5.16.php',
     ];
 
     /**
@@ -157,6 +158,10 @@ class Updates {
      */
     public function perform_updates() {
         if ( ! $this->is_needs_update() ) {
+            return;
+        }
+
+        if ( ! current_user_can( 'update_plugins' ) ) {
             return;
         }
 
