@@ -26,7 +26,9 @@
         "wp-coding-standards/wpcs": "dev-master",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.4.3",
         "lucatume/wp-browser": "^2.2",
-        "fzaninotto/faker": "^1.9@dev"
+        "fzaninotto/faker": "^1.9@dev",
+        "codeception/module-db": "^1.0",
+        "codeception/module-webdriver": "^1.0"
     },
     "scripts": {
         "phpcs": [
