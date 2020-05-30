@@ -22,13 +22,15 @@
         "appsero/client": "^1.1"
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "3.3.2",
         "wp-coding-standards/wpcs": "dev-master",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.4.3",
-        "lucatume/wp-browser": "^2.2",
+        "lucatume/wp-browser": "dev-master",
         "fzaninotto/faker": "^1.9@dev",
+        "codeception/module-webdriver": "^1.0",
         "codeception/module-db": "^1.0",
-        "codeception/module-webdriver": "^1.0"
+        "codeception/module-filesystem": "^1.0",
+        "codeception/module-cli": "^1.0",
+        "phpunit/phpunit": "9.1"
     },
     "scripts": {
         "phpcs": [
